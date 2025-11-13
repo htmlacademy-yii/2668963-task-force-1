@@ -1,122 +1,28 @@
 <?php
 
-class Task 
-{
+require_once('Task.php');
 
-    const STATUS_NEW = 'new';
-    const STATUS_CANCELED = 'canceled';
-    const STATUS_INPROGRESS = 'in_progress';
-    const STATUS_COMPLETE = 'complete';
-    const STATUS_FAILED = 'failed';
+$cleanHouse = new Task(customerId: 10, performerId: 30);
 
-    const ACTION_CANCEL = 'action_cancel';
-    const ACTION_RESPONSE = 'action_response';
-    const ACTION_DONE = 'action_done';
-    const ACTION_REJECT = 'action_reject';
-
-    public int $customerId;
-    public int $performerId;
-
-    public string $currentStatus;
-
-    public function __construct($customerId, $performerId)
-    {
-        $this->customerId = $customerId;
-        $this->performerId = $performerId;
-    }
-
-    public function statusMatchingTranslate($status)
-    {
-        $match = [
-            self::STATUS_NEW => 'Новое',
-            self::STATUS_CANCELED => 'Отменено',
-            self::STATUS_INPROGRESS => 'В работе',
-            self::STATUS_COMPLETE => 'Выполнено',
-            self::STATUS_FAILED => 'Провалено'
-        ];
-
-        return $match[$status];
-    }
-
-    public function actionMatchingTranslate($action)
-    {
-        $match = [
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_RESPONSE => 'Откликнуться',
-            self::ACTION_DONE => 'Завершить',
-            self::ACTION_REJECT => 'Отказаться'
-        ];
-
-        return $match[$action];
-    }
-
-    public function getNextStatus($action)
-    {
-        switch ($action) {
-            case self::ACTION_CANCEL:
-                return self::STATUS_CANCELED;
-                break;
-            case self::ACTION_RESPONSE:
-                return self::STATUS_INPROGRESS;
-                break;
-            case self::ACTION_DONE:
-                return self::STATUS_COMPLETE;
-                break;
-            case self::ACTION_REJECT:
-                return self::STATUS_FAILED;
-                break;
-            default:
-                return null;
-        }
-    }
-
-    public function getAvailableAction($status)
-    {
-        switch ($status) {
-            case self::STATUS_NEW:
-                return [self::ACTION_RESPONSE, self::ACTION_CANCEL];
-                break;
-            case self::STATUS_INPROGRESS:
-                return [self::ACTION_DONE, self::ACTION_REJECT];
-                break;
-            default:
-                return [];
-        }
-    }
-
-    public function setStatus($status)
-    {
-        $this->currentStatus = $status;
-    }
-    
-    public function getStatus()
-    {
-        return $this->currentStatus;
-    }
-
-}
-
-$cleanHouse = new Task(10, 30);
-
-$cleanHouse->setStatus('new');
-var_dump($cleanHouse->statusMatchingTranslate($cleanHouse->getStatus()));
+$cleanHouse->setStatus(status: 'new');
+var_dump($cleanHouse->statusMatchingTranslate(status: $cleanHouse->getStatus()));
 
 
-$nextStatus = $cleanHouse->getNextStatus('action_cancel');
+$nextStatus = $cleanHouse->getNextStatus(action: 'action_cancel');
 
 if ($nextStatus) {
-    var_dump($cleanHouse->statusMatchingTranslate($nextStatus));
+    var_dump($cleanHouse->statusMatchingTranslate(status: $nextStatus));
 } else {
     echo('Нет доступных статусов');
 }
 
 
 
-$availableAction = $cleanHouse->getAvailableAction('new');
+$availableAction = $cleanHouse->getAvailableAction();
 
 if ($availableAction) {
     foreach ($availableAction as $action) {
-        var_dump($cleanHouse->actionMatchingTranslate($action));
+        var_dump($cleanHouse->actionMatchingTranslate(action: $action));
     }
 } else {
     echo('Нет доступных действий');
