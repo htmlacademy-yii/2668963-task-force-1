@@ -7,3 +7,9 @@
 *.sublime*
 Thumbs.db
 vendor
+uploads/*
+!uploads/.gitkeep
+.docker
+.env
+docker-compose.yml
+composer.phar
