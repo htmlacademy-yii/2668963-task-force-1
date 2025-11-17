@@ -1,8 +1,8 @@
 <?php
 
-require_once('Task.php');
+require_once('vendor/autoload.php');
 
-$cleanHouse = new Task(customerId: 10, performerId: 30);
+$cleanHouse = new HtmlAcademy\core\Task(customerId: 10, performerId: 30);
 
 $cleanHouse->setStatus(status: 'new');
 var_dump($cleanHouse->statusMatchingTranslate(status: $cleanHouse->getStatus()));

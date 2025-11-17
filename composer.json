@@ -1,0 +1,16 @@
+{
+    "name": "hera/task-force",
+    "description": "Task platform",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Hera"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "HtmlAcademy\\": "src/"
+        }
+    },
+    "require": {}
+}
