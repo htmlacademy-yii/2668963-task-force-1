@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 namespace HtmlAcademy\core;
+use HtmlAcademy\actions\Cancel;
+use HtmlAcademy\actions\Respons;
+use HtmlAcademy\actions\Done;
+use HtmlAcademy\actions\Reject;
 
 class Task 
 {
@@ -11,10 +15,10 @@ class Task
     const STATUS_COMPLETE = 'complete';
     const STATUS_FAILED = 'failed';
 
-    const ACTION_CANCEL = 'action_cancel';
-    const ACTION_RESPONSE = 'action_response';
-    const ACTION_DONE = 'action_done';
-    const ACTION_REJECT = 'action_reject';
+    // const ACTION_CANCEL = 'action_cancel';
+    // const ACTION_RESPONSE = 'action_response';
+    // const ACTION_DONE = 'action_done';
+    // const ACTION_REJECT = 'action_reject';
 
     public int $customerId;
     public int $performerId;
@@ -40,31 +44,31 @@ class Task
         return $match[$status];
     }
 
-    public function actionMatchingTranslate($action)
-    {
-        $match = [
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_RESPONSE => 'Откликнуться',
-            self::ACTION_DONE => 'Завершить',
-            self::ACTION_REJECT => 'Отказаться'
-        ];
+    // public function actionMatchingTranslate($action)
+    // {
+    //     $match = [
+    //         self::ACTION_CANCEL => 'Отменить',
+    //         self::ACTION_RESPONSE => 'Откликнуться',
+    //         self::ACTION_DONE => 'Завершить',
+    //         self::ACTION_REJECT => 'Отказаться'
+    //     ];
 
-        return $match[$action];
-    }
+    //     return $match[$action];
+    // }
 
     public function getNextStatus($action)
     {
         switch ($action) {
-            case self::ACTION_CANCEL:
+            case ($action instanceof Cancel):
                 return self::STATUS_CANCELED;
                 break;
-            case self::ACTION_RESPONSE:
+            case ($action instanceof Respons):
                 return self::STATUS_INPROGRESS;
                 break;
-            case self::ACTION_DONE:
+            case ($action instanceof Done):
                 return self::STATUS_COMPLETE;
                 break;
-            case self::ACTION_REJECT:
+            case ($action instanceof Reject):
                 return self::STATUS_FAILED;
                 break;
             default:
@@ -72,14 +76,14 @@ class Task
         }
     }
 
-    public function getAvailableAction()
+    public function getAvailableAction($userId)
     {
         switch ($this->currentStatus) {
             case self::STATUS_NEW:
-                return [self::ACTION_RESPONSE, self::ACTION_CANCEL];
+                return [new Cancel, new Respons];
                 break;
             case self::STATUS_INPROGRESS:
-                return [self::ACTION_DONE, self::ACTION_REJECT];
+                return [new Done, new Reject];
                 break;
             default:
                 return [];
