@@ -27,7 +27,7 @@ CREATE TABLE users (
     location VARCHAR(128) NOT NULL,
     about VARCHAR(128),
     avatar VARCHAR(255),
-    phone VARCHAR(128),
+    phone VARCHAR(32),
     telegram VARCHAR(128),
     specialization_id INT,
     FOREIGN KEY (specialization_id) REFERENCES specializations(id)
@@ -37,7 +37,7 @@ CREATE TABLE tasks (
     id INT AUTO_INCREMENT PRIMARY KEY,
     date_add TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     title VARCHAR(128) NOT NULL,
-    description VARCHAR(128) NOT NULL,
+    description VARCHAR(500) NOT NULL,
     category_id INT NOT NULL,
     location VARCHAR(128) NOT NULL,
     budget INT NOT NULL,
