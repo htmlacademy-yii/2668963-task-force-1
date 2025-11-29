@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 namespace HtmlAcademy\actions;
+use HtmlAcademy\enums\TaskActions;
 
 class Cancel extends Action
 {
 
     public function getName(): string
     {
-        return "Отменить";
+        return TaskActions::CANCEL->label();
     }
     public function getCode(): string
     {
-        return "action_cancel";
+        return TaskActions::CANCEL->value;
     }
     public function checkPermissions($customerId, $performerId, $userId): bool
     {

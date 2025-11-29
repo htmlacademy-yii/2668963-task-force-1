@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 namespace HtmlAcademy\actions;
+use HtmlAcademy\enums\TaskActions;
 
 class Reject extends Action
 {
 
     public function getName(): string
     {
-        return "Отказаться";
+        return TaskActions::REJECT->label();
     }
     public function getCode(): string
     {
-        return "action_reject";
+        return TaskActions::REJECT->value;
     }
     public function checkPermissions($customerId, $performerId, $userId): bool
     {

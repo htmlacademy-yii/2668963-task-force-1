@@ -1,31 +1,46 @@
 <?php
 
+use HtmlAcademy\exceptions\TaskActionsException;
+use HtmlAcademy\exceptions\TaskStatusException;
+
 require_once('vendor/autoload.php');
 
 $userId = 10;
 $cleanHouse = new HtmlAcademy\core\Task(customerId: 10, performerId: 30);
-$action = new HtmlAcademy\actions\Cancel;
-
-$cleanHouse->setStatus(status: 'in_progress');
-var_dump($cleanHouse->statusMatchingTranslate(status: $cleanHouse->getStatus()));
+$action = 'done';
 
 
-// $nextStatus = $cleanHouse->getNextStatus($action);
+try {
+    $cleanHouse->setStatus(status: 'in_progress');
+} catch (TaskStatusException $e) {
+    error_log("Ошибка статуса: " . $e->getMessage());
+    echo("Ошибка статуса: " . $e->getMessage());
+}
+try {
+    $status = $cleanHouse->getStatus();
+    var_dump($cleanHouse->statusGetName($status));
+} catch (TaskStatusException $e) {
+    error_log("Ошибка статуса: " . $e->getMessage());
+    echo("Ошибка статуса: " . $e->getMessage());
+}
 
-// if ($nextStatus) {
-//     var_dump($cleanHouse->statusMatchingTranslate(status: $nextStatus));
-// } else {
-//     echo('Нет доступных статусов');
-// }
+// var_dump($action->getCode());
+
+try {
+    $nextStatus = $cleanHouse->getNextStatus($action);
+    var_dump($cleanHouse->statusGetName(status: $nextStatus));
+} catch (TaskActionsException $e) {
+    error_log("Ошибка действия: " . $e->getMessage());
+    echo("Ошибка действия: " . $e->getMessage());
+}
 
 
-
-$availableAction = $cleanHouse->getAvailableAction($userId);
-
-if ($availableAction) {
+try {
+    $availableAction = $cleanHouse->getAvailableAction();
     foreach ($availableAction as $action) {
         var_dump($action->checkPermissions($cleanHouse->customerId, $cleanHouse->performerId, $userId));
     }
-} else {
-    echo('Нет доступных действий');
+} catch (TaskActionsException $e) {
+    error_log("Ошибка действия: " . $e->getMessage());
+    echo("Ошибка действия: " . $e->getMessage());
 }
