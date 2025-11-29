@@ -6,24 +6,17 @@ use HtmlAcademy\actions\Cancel;
 use HtmlAcademy\actions\Respons;
 use HtmlAcademy\actions\Done;
 use HtmlAcademy\actions\Reject;
+use HtmlAcademy\enums\TaskActions;
+use HtmlAcademy\enums\TaskStatus;
+use HtmlAcademy\exceptions\TaskActionsException;
+use HtmlAcademy\exceptions\TaskStatusException;
 
 class Task 
 {
-    const STATUS_NEW = 'new';
-    const STATUS_CANCELED = 'canceled';
-    const STATUS_INPROGRESS = 'in_progress';
-    const STATUS_COMPLETE = 'complete';
-    const STATUS_FAILED = 'failed';
-
-    // const ACTION_CANCEL = 'action_cancel';
-    // const ACTION_RESPONSE = 'action_response';
-    // const ACTION_DONE = 'action_done';
-    // const ACTION_REJECT = 'action_reject';
-
     public int $customerId;
     public int $performerId;
 
-    public string $currentStatus;
+    public ?string $currentStatus = null;
 
     public function __construct($customerId, $performerId)
     {
@@ -31,58 +24,47 @@ class Task
         $this->performerId = $performerId;
     }
 
-    public function statusMatchingTranslate($status)
+    public function statusGetName(string $status): string
     {
-        $match = [
-            self::STATUS_NEW => 'Новое',
-            self::STATUS_CANCELED => 'Отменено',
-            self::STATUS_INPROGRESS => 'В работе',
-            self::STATUS_COMPLETE => 'Выполнено',
-            self::STATUS_FAILED => 'Провалено'
-        ];
-
-        return $match[$status];
+        TaskStatus::from($status);
+        return TaskStatus::from($status)->label();
     }
 
-    // public function actionMatchingTranslate($action)
-    // {
-    //     $match = [
-    //         self::ACTION_CANCEL => 'Отменить',
-    //         self::ACTION_RESPONSE => 'Откликнуться',
-    //         self::ACTION_DONE => 'Завершить',
-    //         self::ACTION_REJECT => 'Отказаться'
-    //     ];
-
-    //     return $match[$action];
-    // }
-
-    public function getNextStatus($action)
+    public function getNextStatus(string $action): ?string
     {
-        switch ($action) {
-            case ($action instanceof Cancel):
-                return self::STATUS_CANCELED;
+        try {
+            $enumAction = TaskActions::from($action);
+        }catch (\ValueError $e) {
+            throw new TaskActionsException("Действия '$action' не существует");
+        }
+        switch ($enumAction->value) {
+            case (TaskActions::CANCEL->value):
+                return TaskStatus::CANCELED->value;
                 break;
-            case ($action instanceof Respons):
-                return self::STATUS_INPROGRESS;
+            case (TaskActions::RESPONSE->value):
+                return TaskStatus::INPROGRESS->value;
                 break;
-            case ($action instanceof Done):
-                return self::STATUS_COMPLETE;
+            case (TaskActions::DONE->value):
+                return TaskStatus::COMPLETE->value;
                 break;
-            case ($action instanceof Reject):
-                return self::STATUS_FAILED;
+            case (TaskActions::REJECT->value):
+                return TaskStatus::FAILED->value;
                 break;
             default:
                 return null;
         }
     }
 
-    public function getAvailableAction($userId)
+    public function getAvailableAction(): array
     {
+        if ($this->currentStatus === null) {
+            throw new TaskActionsException("Нет доступного действия, статус не установлен");
+        }
         switch ($this->currentStatus) {
-            case self::STATUS_NEW:
+            case TaskStatus::NEW->value:
                 return [new Cancel, new Respons];
                 break;
-            case self::STATUS_INPROGRESS:
+            case TaskStatus::INPROGRESS->value:
                 return [new Done, new Reject];
                 break;
             default:
@@ -90,13 +72,21 @@ class Task
         }
     }
 
-    public function setStatus($status)
+    public function setStatus(string $status): void
     {
-        $this->currentStatus = $status;
+        try {
+            $enumStatus = TaskStatus::from($status);
+        } catch (\ValueError $e) {
+            throw new TaskStatusException("Статус '$status' не существует");
+        }
+        $this->currentStatus = $enumStatus->value;
     }
     
-    public function getStatus()
+    public function getStatus(): string
     {
+        if ($this->currentStatus === null) {
+            throw new TaskStatusException("Статус не установлен");
+        }
         return $this->currentStatus;
     }
 }

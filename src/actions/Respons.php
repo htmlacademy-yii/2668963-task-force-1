@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 namespace HtmlAcademy\actions;
+use HtmlAcademy\enums\TaskActions;
 
 class Respons extends Action
 {
 
     public function getName(): string
     {
-        return "Откликнуться";
+        return TaskActions::RESPONSE->label();
     }
     public function getCode(): string
     {
-        return "action_response";
+        return TaskActions::RESPONSE->value;
     }
     public function checkPermissions($customerId, $performerId, $userId): bool
     {
