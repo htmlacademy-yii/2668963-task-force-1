@@ -2,8 +2,10 @@
 
 use HtmlAcademy\exceptions\TaskActionsException;
 use HtmlAcademy\exceptions\TaskStatusException;
+use HtmlAcademy\helpers\CsvToSqlConverter;
 
 require_once('vendor/autoload.php');
+
 
 $userId = 10;
 $cleanHouse = new HtmlAcademy\core\Task(customerId: 10, performerId: 30);
@@ -44,3 +46,6 @@ try {
     error_log("Ошибка действия: " . $e->getMessage());
     echo("Ошибка действия: " . $e->getMessage());
 }
+
+
+CsvToSqlConverter::convert(__DIR__ . "/data/cities.csv", __DIR__);
