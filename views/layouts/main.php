@@ -69,6 +69,12 @@ $action = 'done';
 <div class="main-container">
 
     <?php
+
+        $rows = Yii::$app->db->createCommand('SELECT * FROM categories')->queryAll();
+        foreach ($rows as $row) {
+            echo $row['id'] . ' - ' . $row['name'] . "<br>";
+        }
+        echo "<br>";
         try {
             $cleanHouse->setStatus(status: 'in_progress');
         } catch (TaskStatusException $e) {
@@ -103,7 +109,6 @@ $action = 'done';
             error_log("Ошибка действия: " . $e->getMessage());
             echo("Ошибка действия: " . $e->getMessage());
         }
-
 
         CsvToSqlConverter::convert("../data/categories.csv", "../");
 
