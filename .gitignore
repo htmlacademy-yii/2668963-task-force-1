@@ -47,6 +47,7 @@ uploads/*
 .env.*
 
 # Local config files
+config/
 config/*.local.php
 
 # Composer lock file

@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Category;
 use HtmlAcademy\exceptions\TaskActionsException;
 use HtmlAcademy\exceptions\TaskStatusException;
 use HtmlAcademy\helpers\CsvToSqlConverter;
@@ -70,11 +71,18 @@ $action = 'done';
 
     <?php
 
-        $rows = Yii::$app->db->createCommand('SELECT * FROM categories')->queryAll();
+        // $rows = Yii::$app->db->createCommand('SELECT * FROM categories')->queryAll();
+        // foreach ($rows as $row) {
+        //     echo $row['id'] . ' - ' . $row['name'] . "<br>";
+        // }
+        $rows = Category::findOne(1);
         foreach ($rows as $row) {
-            echo $row['id'] . ' - ' . $row['name'] . "<br>";
+            var_dump($row);
         }
         echo "<br>";
+        echo "<br>";
+
+
         try {
             $cleanHouse->setStatus(status: 'in_progress');
         } catch (TaskStatusException $e) {
