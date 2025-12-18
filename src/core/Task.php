@@ -24,7 +24,7 @@ class Task
         $this->performerId = $performerId;
     }
 
-    public function statusGetName(string $status): string
+    public static function statusGetName(string $status): string
     {
         TaskStatus::from($status);
         return TaskStatus::from($status)->label();

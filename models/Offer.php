@@ -39,8 +39,8 @@ class Offer extends \yii\db\ActiveRecord
             [['performer_id', 'price', 'task_id', 'status'], 'required'],
             [['performer_id', 'price', 'task_id'], 'integer'],
             [['status'], 'string', 'max' => 128],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['performer_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['performer_id' => 'id']],
         ];
     }
 
@@ -66,7 +66,7 @@ class Offer extends \yii\db\ActiveRecord
      */
     public function getPerformer()
     {
-        return $this->hasOne(Users::class, ['id' => 'performer_id']);
+        return $this->hasOne(User::class, ['id' => 'performer_id']);
     }
 
     /**
@@ -76,7 +76,7 @@ class Offer extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

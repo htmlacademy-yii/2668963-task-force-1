@@ -2,103 +2,154 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "users".
+ *
+ * @property int $id
+ * @property string|null $date_add
+ * @property string $role
+ * @property string|null $birthday
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string|null $about
+ * @property string|null $avatar
+ * @property string|null $phone
+ * @property string|null $telegram
+ * @property int $city_id
+ * @property int|null $specialization_id
+ *
+ * @property Cities $city
+ * @property Offers[] $offers
+ * @property Reviews[] $reviews
+ * @property Reviews[] $reviews0
+ * @property Specializations $specialization
+ * @property Tasks[] $tasks
+ * @property Tasks[] $tasks0
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
 
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return 'users';
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['birthday', 'about', 'avatar', 'phone', 'telegram', 'specialization_id'], 'default', 'value' => null],
+            [['date_add', 'birthday'], 'safe'],
+            [['role', 'name', 'email', 'password', 'city_id'], 'required'],
+            [['city_id', 'specialization_id'], 'integer'],
+            [['role', 'name', 'email', 'about', 'telegram'], 'string', 'max' => 128],
+            [['password', 'avatar'], 'string', 'max' => 255],
+            [['phone'], 'string', 'max' => 32],
+            [['email'], 'unique'],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['specialization_id'], 'exist', 'skipOnError' => true, 'targetClass' => Specializations::class, 'targetAttribute' => ['specialization_id' => 'id']],
+        ];
     }
 
     /**
-     * Finds user by username
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'date_add' => 'Date Add',
+            'role' => 'Role',
+            'birthday' => 'Birthday',
+            'name' => 'Name',
+            'email' => 'Email',
+            'password' => 'Password',
+            'about' => 'About',
+            'avatar' => 'Avatar',
+            'phone' => 'Phone',
+            'telegram' => 'Telegram',
+            'city_id' => 'City ID',
+            'specialization_id' => 'Specialization ID',
+        ];
+    }
+
+    /**
+     * Gets query for [[City]].
      *
-     * @param string $username
-     * @return static|null
+     * @return \yii\db\ActiveQuery
      */
-    public static function findByUsername($username)
+    public function getCity()
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
+     * Gets query for [[Offers]].
      *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return \yii\db\ActiveQuery
      */
-    public function validatePassword($password)
+    public function getOffers()
     {
-        return $this->password === $password;
+        return $this->hasMany(Offers::class, ['performer_id' => 'id']);
     }
+
+    /**
+     * Gets query for [[Reviews]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReviews()
+    {
+        return $this->hasMany(Reviews::class, ['customer_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Reviews0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReviews0()
+    {
+        return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Specialization]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSpecialization()
+    {
+        return $this->hasOne(Specializations::class, ['id' => 'specialization_id']);
+    }
+
+    /**
+     * Gets query for [[Tasks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasks()
+    {
+        return $this->hasMany(Tasks::class, ['customer_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Tasks0]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasks0()
+    {
+        return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
+    }
+
 }

@@ -7,6 +7,7 @@ use app\models\Category;
 use app\models\Task;
 use app\models\TaskFilterForm;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class TaskController extends Controller
 {
@@ -34,7 +35,7 @@ class TaskController extends Controller
                     $query->andWhere(['>=', 'date_add', $fromTime]);
                 }
 
-                $tasks = $query->all();
+                $tasks = $query->orderBy(['date_add' => SORT_DESC])->all();
 
             } else {
                 $tasks = Task::find()
@@ -57,4 +58,18 @@ class TaskController extends Controller
             'filterForm' => $filterForm,
         ]);
     }
+
+    public function actionView($id) 
+    {
+        $task = Task::findOne($id);
+
+        if ($task === null) {
+            throw new NotFoundHttpException('Задача не найдена');
+        }
+
+        return $this->render('view', [
+            'task' => $task,
+        ]);
+    }
+
 }
