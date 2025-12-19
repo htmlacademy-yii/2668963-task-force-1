@@ -44,18 +44,24 @@ class User extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+
+    public $password_repeat;
+
     public function rules()
     {
         return [
             [['birthday', 'about', 'avatar', 'phone', 'telegram', 'specialization_id'], 'default', 'value' => null],
             [['date_add', 'birthday'], 'safe'],
-            [['role', 'name', 'email', 'password', 'city_id'], 'required'],
+            [['role', 'name', 'email', 'city_id'], 'required'],
+            [['email'], 'email'],
+            [['password', 'password_repeat'], 'required'],
+            ['password_repeat', 'compare', 'compareAttribute' => 'password'],
             [['city_id', 'specialization_id'], 'integer'],
             [['role', 'name', 'email', 'about', 'telegram'], 'string', 'max' => 128],
             [['password', 'avatar'], 'string', 'max' => 255],
             [['phone'], 'string', 'max' => 32],
             [['email'], 'unique'],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
             [['specialization_id'], 'exist', 'skipOnError' => true, 'targetClass' => Specializations::class, 'targetAttribute' => ['specialization_id' => 'id']],
         ];
     }
@@ -77,7 +83,7 @@ class User extends \yii\db\ActiveRecord
             'avatar' => 'Avatar',
             'phone' => 'Phone',
             'telegram' => 'Telegram',
-            'city_id' => 'City ID',
+            'city_id' => 'City Name',
             'specialization_id' => 'Specialization ID',
         ];
     }
@@ -89,7 +95,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(Cities::class, ['id' => 'city_id']);
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
     /**
