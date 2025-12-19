@@ -10,11 +10,6 @@ use yii\web\Controller;
 class SignupController extends Controller
 {
 
-    public function beforeAction($action)
-    {
-        return true;
-    }
-
     public function actionIndex()
     {
 
