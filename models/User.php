@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
@@ -29,7 +30,7 @@ use Yii;
  * @property Tasks[] $tasks
  * @property Tasks[] $tasks0
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
 
 
@@ -47,6 +48,31 @@ class User extends \yii\db\ActiveRecord
 
     public $password_repeat;
 
+
+    public static function findIdentity($id)
+    {
+        return self::findOne($id);
+    }
+
+    public function getId()
+    {
+        return $this->getPrimaryKey();
+    }
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+    public function getAuthKey()
+    {
+        // TODO: Implement getAuthKey() method.
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // TODO: Implement validateAuthKey() method.
+    }
+
+    
     public function rules()
     {
         return [

@@ -17,9 +17,10 @@ $action = 'done';
 // foreach ($rows as $row) {
 //     echo $row['id'] . ' - ' . $row['name'] . "<br>";
 // }
+
 $rows = Category::findOne(1);
 foreach ($rows as $row) {
-    var_dump($row);
+    // var_dump($row);
 }
 echo "<br>";
 echo "<br>";
@@ -33,7 +34,7 @@ try {
 }
 try {
     $status = $cleanHouse->getStatus();
-    var_dump($cleanHouse->statusGetName($status));
+    // var_dump($cleanHouse->statusGetName($status));
 } catch (TaskStatusException $e) {
     error_log("Ошибка статуса: " . $e->getMessage());
     echo("Ошибка статуса: " . $e->getMessage());
@@ -43,7 +44,7 @@ try {
 
 try {
     $nextStatus = $cleanHouse->getNextStatus($action);
-    var_dump($cleanHouse->statusGetName(status: $nextStatus));
+    // var_dump($cleanHouse->statusGetName(status: $nextStatus));
 } catch (TaskActionsException $e) {
     error_log("Ошибка действия: " . $e->getMessage());
     echo("Ошибка действия: " . $e->getMessage());
@@ -53,11 +54,13 @@ try {
 try {
     $availableAction = $cleanHouse->getAvailableAction();
     foreach ($availableAction as $action) {
-        var_dump($action->checkPermissions($cleanHouse->customerId, $cleanHouse->performerId, $userId));
+        // var_dump($action->checkPermissions($cleanHouse->customerId, $cleanHouse->performerId, $userId));
     }
 } catch (TaskActionsException $e) {
     error_log("Ошибка действия: " . $e->getMessage());
     echo("Ошибка действия: " . $e->getMessage());
 }
 
-CsvToSqlConverter::convert("../data/categories.csv", "../");
+// CsvToSqlConverter::convert("../data/categories.csv", "../");
+?>
+

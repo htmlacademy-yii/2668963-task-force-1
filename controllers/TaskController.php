@@ -13,6 +13,9 @@ class TaskController extends Controller
 {
     public function actionIndex()
     {
+        if (Yii::$app->user->isGuest) {
+            return $this->redirect(['/']);
+        }
         $filterForm = new TaskFilterForm();
 
         if (Yii::$app->request->isGet) {            
