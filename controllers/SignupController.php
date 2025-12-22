@@ -12,7 +12,9 @@ class SignupController extends Controller
 
     public function actionIndex()
     {
-
+        if (!Yii::$app->user->isGuest) {
+            return $this->redirect(['/']);
+        }
         $cities = City::find()->select(['id', 'name'])->all();
 
         $user = new User();

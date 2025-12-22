@@ -15,24 +15,44 @@ class SiteController extends Controller
     /**
      * {@inheritdoc}
      */
+    // public function behaviors()
+    // {
+    //     return [
+    //         'access' => [
+    //             'class' => AccessControl::class,
+    //             'only' => ['logout'],
+    //             'rules' => [
+    //                 [
+    //                     'actions' => ['logout'],
+    //                     'allow' => true,
+    //                     'roles' => ['@'],
+    //                 ],
+    //             ],
+    //         ],
+    //         'verbs' => [
+    //             'class' => VerbFilter::class,
+    //             'actions' => [
+    //                 'logout' => ['post'],
+    //             ],
+    //         ],
+    //     ];
+    // }
     public function behaviors()
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'controllers' => ['landing'],
+                        'roles' => ['?'],
+                    ],
+                    [
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'logout' => ['post'],
                 ],
             ],
         ];
@@ -61,7 +81,12 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // return $this->render('index');
+        if (!\Yii::$app->user->isGuest) {
+            return $this->redirect(['/task']);
+        }
+
+        return $this->redirect(['/landing']);
     }
 
     /**
