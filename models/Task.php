@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "tasks".
@@ -30,7 +31,8 @@ use Yii;
  */
 class Task extends \yii\db\ActiveRecord
 {
-
+    /** @var UploadedFile[] */
+    public array $files = [];
 
     /**
      * {@inheritdoc}
@@ -49,7 +51,10 @@ class Task extends \yii\db\ActiveRecord
             [['status', 'performer_id'], 'default', 'value' => null],
             [['date_add', 'deadline'], 'safe'],
             [['title', 'description', 'category_id', 'location', 'budget', 'deadline', 'city_id', 'customer_id'], 'required'],
-            [['category_id', 'budget', 'city_id', 'customer_id', 'performer_id'], 'integer'],
+            [['files'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 5],
+            [['category_id', 'city_id', 'customer_id', 'performer_id'], 'integer'],
+            [['deadline'], 'validateFutureDate'],
+            [['budget'], 'integer', 'min' => 1],
             [['title', 'location', 'status'], 'string', 'max' => 128],
             [['description'], 'string', 'max' => 500],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
@@ -149,5 +154,20 @@ class Task extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Review::class, ['task_id' => 'id']);
     }
+
+    public function validateFutureDate($attribute)
+    {
+        if (!$this->$attribute) {
+            return;
+        }
+
+        if (strtotime($this->$attribute) <= time()) {
+            $this->addError(
+                $attribute,
+                'Дата должна быть больше текущей'
+            );
+        }
+    }
+
 
 }

@@ -3,7 +3,8 @@
     use yii\web\User;
 
     if (!Yii::$app->user->isGuest) {
-        $user = Yii::$app->user->identity->name;
+        $user = Yii::$app->user->identity;
+        $username = $user->name;
     }
     
 ?>
@@ -11,6 +12,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <?php echo date('Y-m-d H:i:s'); ?>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Taskforce</title>
@@ -31,15 +33,17 @@
                 </a>
                 <div class="nav-wrapper">
                     <ul class="nav-list">
-                        <li class="list-item list-item--active">
-                            <a class="link link--nav" >Новое</a>
+                        <li class="list-item"> <!--list-item--active-->
+                            <a href="/task" class="link link--nav" >Новое</a>
                         </li>
                         <li class="list-item">
                             <a href="#" class="link link--nav">Мои задания</a>
                         </li>
-                        <li class="list-item">
-                            <a href="#" class="link link--nav">Создать задание</a>
-                        </li>
+                        <?php if ($user->role === 'customer') { ?>
+                            <li class="list-item">
+                                <a href="/add" class="link link--nav">Создать задание</a>
+                            </li>
+                        <?php }; ?>
                         <li class="list-item">
                             <a href="#" class="link link--nav">Настройки</a>
                         </li>
@@ -51,7 +55,7 @@
                     <img class="user-photo" src="<?= Yii::getAlias('@web/img/man-glasses.png') ?>" width="55" height="55" alt="Аватар">
                 </a>
                 <div class="user-menu">
-                    <p class="user-name"><?= $user; ?></p>
+                    <p class="user-name"><?= $username; ?></p>
                     <div class="popup-head">
                         <ul class="popup-menu">
                             <li class="menu-item">
