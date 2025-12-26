@@ -6,17 +6,24 @@
         $user = Yii::$app->user->identity;
         $username = $user->name;
     }
-    
+    // $user = Yii::$app->user->identity;
 ?>
 
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <?php echo date('Y-m-d H:i:s'); ?>
+    <?php echo date('Y-m-d H:i:s'); echo ' | '; echo $user?->id; echo ' | '; echo $user?->email; 
+    ?>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Taskforce</title>
     <link rel="stylesheet" href="<?= Yii::getAlias('@web/css/style.css') ?>">
+    <style>
+        .response-card.deny{
+            filter: brightness(0.5);
+        }
+    </style>
 </head>
 <body>
     <header class="page-header">

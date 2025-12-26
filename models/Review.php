@@ -39,11 +39,12 @@ class Review extends \yii\db\ActiveRecord
         return [
             [['date_add'], 'safe'],
             [['text', 'score', 'task_id', 'customer_id', 'performer_id'], 'required'],
-            [['score', 'task_id', 'customer_id', 'performer_id'], 'integer'],
+            [['task_id', 'customer_id', 'performer_id'], 'integer'],
             [['text'], 'string', 'max' => 128],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['customer_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['performer_id' => 'id']],
+            [['score'], 'integer', 'min' => 1, 'max' => 5],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['performer_id' => 'id']],
         ];
     }
 
@@ -70,7 +71,7 @@ class Review extends \yii\db\ActiveRecord
      */
     public function getCustomer()
     {
-        return $this->hasOne(Users::class, ['id' => 'customer_id']);
+        return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
 
     /**
@@ -80,7 +81,7 @@ class Review extends \yii\db\ActiveRecord
      */
     public function getPerformer()
     {
-        return $this->hasOne(Users::class, ['id' => 'performer_id']);
+        return $this->hasOne(User::class, ['id' => 'performer_id']);
     }
 
     /**
@@ -90,7 +91,7 @@ class Review extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

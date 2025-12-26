@@ -46,3 +46,34 @@ if (buttonInput) {
         }
     });
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    var containers = document.querySelectorAll('.stars-rating');
+
+    containers.forEach(function (container) {
+
+        var input = document.querySelector(container.dataset.input);
+        if (!input) return;
+
+        var stars = container.querySelectorAll('span');
+
+        stars.forEach(function (star) {
+            star.addEventListener('click', function () {
+
+                var value = parseInt(star.dataset.value, 10);
+                input.value = value;
+
+                stars.forEach(function (s) {
+                    if (parseInt(s.dataset.value, 10) <= value) {
+                        s.classList.add('fill-star');
+                    } else {
+                        s.classList.remove('fill-star');
+                    }
+                });
+            });
+        });
+
+    });
+});

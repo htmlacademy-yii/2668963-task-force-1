@@ -36,9 +36,11 @@ class Offer extends \yii\db\ActiveRecord
     {
         return [
             [['date_add'], 'safe'],
-            [['performer_id', 'price', 'task_id', 'status'], 'required'],
+            [['performer_id', 'price', 'task_id', 'status', 'comment'], 'required'],
             [['performer_id', 'price', 'task_id'], 'integer'],
+            [['price'], 'integer', 'min' => 1],
             [['status'], 'string', 'max' => 128],
+            [['comment'], 'string', 'max' => 255],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
             [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['performer_id' => 'id']],
         ];
@@ -56,6 +58,7 @@ class Offer extends \yii\db\ActiveRecord
             'price' => 'Price',
             'task_id' => 'Task ID',
             'status' => 'Status',
+            'comment' => 'Comment',
         ];
     }
 

@@ -1,9 +1,19 @@
 <?php
 
+declare(strict_types=1);
 namespace app\models;
 
 use Yii;
 use yii\web\UploadedFile;
+use HtmlAcademy\actions\Cancel;
+use HtmlAcademy\actions\Respons;
+use HtmlAcademy\actions\Done;
+use HtmlAcademy\actions\Reject;
+use HtmlAcademy\enums\OfferStatus;
+use HtmlAcademy\enums\TaskActions;
+use HtmlAcademy\enums\TaskStatus;
+use HtmlAcademy\exceptions\TaskActionsException;
+use HtmlAcademy\exceptions\TaskStatusException;
 
 /**
  * This is the model class for table "tasks".
@@ -167,6 +177,99 @@ class Task extends \yii\db\ActiveRecord
                 'Дата должна быть больше текущей'
             );
         }
+    }
+
+    /**
+     * Принятие оффера заказчиком
+     */
+    public function accept(int $userId, int $offerId): bool
+    {
+        if (!$this->canBeChangedBy($userId)) {
+            return false;
+        }
+        if ($this->status !== TaskStatus::NEW->value) {
+            return false;
+        }
+
+
+        $offer = Offer::findOne([
+            'id' => $offerId,
+            'task_id' => $this->id
+        ]);
+
+        if (!$offer) {
+            return false;
+        }
+
+        $this->performer_id = $offer->performer_id;
+        $this->status = TaskStatus::INPROGRESS->value;
+
+        $offer->status = OfferStatus::CONFIRM->value;
+        $offer->save(false);
+        
+        Offer::updateAll(
+            ['status' => OfferStatus::DENY->value],
+            ['and', ['task_id' => $this->id], ['!=', 'id', $offerId]]
+        );
+
+
+        return $this->save(false);
+    }
+
+    /**
+     * Отказ оффера заказчиком
+     */    
+    public function reject($userId, $offerId): bool
+    {
+        if (!$this->canBeChangedBy($userId)) {
+            return false;
+        }
+
+        $offer = Offer::findOne([
+            'id' => $offerId,
+            'task_id' => $this->id
+        ]);
+
+        if (!$offer) {
+            return false;
+        }
+
+        $offer->status = OfferStatus::DENY->value;
+        return $offer->save(false);
+    }
+
+    /**
+     *  Отмена задания заказчиком
+     */    
+    public function cancel($userId, $taskId): bool
+    {
+        if (!$this->canBeChangedBy($userId)) {
+            return false;
+        }
+
+        $task = Task::findOne([
+            'id' => $taskId,
+        ]);
+
+        if (!$task) {
+            return false;
+        }
+
+        Offer::updateAll(
+            ['status' => OfferStatus::DENY->value],
+            ['and', ['task_id' => $this->id]]
+        );
+        
+        $task->status = TaskStatus::CANCELED->value;
+        return $task->save(false);
+    }
+
+
+
+    private function canBeChangedBy($userId): bool
+    {
+        return $this->customer_id === $userId
+            && $this->status === TaskStatus::NEW->value;
     }
 
 
