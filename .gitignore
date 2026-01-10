@@ -3,6 +3,9 @@
 *.pem
 certs/
 
+img
+img/avatars
+
 # phpstorm project files
 .idea
 

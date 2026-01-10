@@ -47,6 +47,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
 
     public $password_repeat;
+    public $avatarFile;
+    public $category_ids = [];
 
 
     public static function findIdentity($id)
@@ -77,25 +79,67 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     }
 
-    
+
+    // public function rules()
+    // {
+    //     return [
+    //         [['birthday', 'about', 'avatar', 'phone', 'telegram', 'specialization_id'], 'default', 'value' => null],
+    //         [['date_add', 'birthday'], 'safe'],
+    //         [['role', 'name', 'email', 'city_id'], 'required'],
+    //         [['email'], 'email'],
+    //         [['password', 'password_repeat'], 'required'],
+    //         ['password_repeat', 'compare', 'compareAttribute' => 'password'],
+    //         [['city_id', 'specialization_id'], 'integer'],
+    //         [['role', 'name', 'email', 'about', 'telegram'], 'string', 'max' => 128],
+    //         [['password', 'avatar'], 'string', 'max' => 255],
+    //         [['phone'], 'string', 'max' => 32],
+    //         [['email'], 'unique'],
+    //         [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+    //         [['specialization_id'], 'exist', 'skipOnError' => true, 'targetClass' => Specializations::class, 'targetAttribute' => ['specialization_id' => 'id']],
+    //     ];
+    // }
     public function rules()
     {
         return [
-            [['birthday', 'about', 'avatar', 'phone', 'telegram', 'specialization_id'], 'default', 'value' => null],
-            [['date_add', 'birthday'], 'safe'],
-            [['role', 'name', 'email', 'city_id'], 'required'],
+
+            [['birthday', 'about', 'avatar', 'phone', 'telegram'], 'default', 'value' => null],
+
+            [['date_add', 'birthday', 'category_ids'], 'safe'],
+
+            ['birthday', 'compare', 'compareValue' => date('Y-m-d', strtotime('-18 years')), 'operator' => '<=', 'message' => 'Вам должно быть не менее 18 лет'],
+
+
+            [['role', 'name', 'email', 'city_id'], 'required', 'on' => 'signup'],
+            [['password', 'password_repeat'], 'required', 'on' => 'signup'],
+
             [['email'], 'email'],
-            [['password', 'password_repeat'], 'required'],
+            [['email'], 'unique', 'on' => 'signup'],
+
+            [['password'], 'string', 'max' => 255],
             ['password_repeat', 'compare', 'compareAttribute' => 'password'],
-            [['city_id', 'specialization_id'], 'integer'],
+
             [['role', 'name', 'email', 'about', 'telegram'], 'string', 'max' => 128],
-            [['password', 'avatar'], 'string', 'max' => 255],
-            [['phone'], 'string', 'max' => 32],
-            [['email'], 'unique'],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
-            [['specialization_id'], 'exist', 'skipOnError' => true, 'targetClass' => Specializations::class, 'targetAttribute' => ['specialization_id' => 'id']],
+            ['phone', 'match', 'pattern' => '/^\d{10,15}$/', 'message' => 'Телефон должен содержать только цифры, от 10 до 15 символов.'],
+            ['telegram', 'match', 'pattern' => '/^[a-zA-Z0-9_]+$/', 'message' => 'Телеграм может содержать только латинские буквы, цифры и _'],
+            ['about', 'string', 'max' => 255, 'tooLong' => 'Максимум 255 символов'],
+
+
+            [['city_id'], 'integer'],
+
+            ['avatar', 'file', 'extensions' => 'png, jpg, jpeg', 'maxSize' => 2 * 1024 * 1024],
+            // ['avatarFile', 'file', 'extensions' => 'png, jpg, jpeg'],
+
+            [['city_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => City::class,
+                'targetAttribute' => ['city_id' => 'id']
+            ],
+            // [['specialization_id'], 'exist', 'skipOnError' => true,
+            //     'targetClass' => Specialization::class,
+            //     'targetAttribute' => ['specialization_id' => 'id']
+            // ],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -115,7 +159,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'phone' => 'Phone',
             'telegram' => 'Telegram',
             'city_id' => 'City Name',
-            'specialization_id' => 'Specialization ID',
+            // 'specialization_id' => 'Specialization ID',
         ];
     }
 
@@ -164,9 +208,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSpecialization()
+    // public function getSpecialization()
+    // {
+    //     return $this->hasOne(Specializations::class, ['id' => 'specialization_id']);
+    // }
+    public function getSpecializations()
     {
-        return $this->hasOne(Specializations::class, ['id' => 'specialization_id']);
+        return $this->hasMany(Specialization::class, ['performer_id' => 'id']);
     }
 
     /**
@@ -188,5 +236,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
     }
-
+    
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if (!empty($this->birthday) && strlen($this->birthday) === 10) {
+                $this->birthday .= ' 00:00:00';
+            }
+            return true;
+        }
+        return false;
+    }
 }

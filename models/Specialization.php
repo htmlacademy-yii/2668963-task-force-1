@@ -30,11 +30,14 @@ class Specialization extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        // return [
+        //     [['title', 'code'], 'required'],
+        //     [['title', 'code'], 'string', 'max' => 128],
+        //     [['title'], 'unique'],
+        //     [['code'], 'unique'],
+        // ];
         return [
-            [['title', 'code'], 'required'],
-            [['title', 'code'], 'string', 'max' => 128],
-            [['title'], 'unique'],
-            [['code'], 'unique'],
+            [['performer_id', 'category_id'], 'required'],
         ];
     }
 
@@ -45,8 +48,8 @@ class Specialization extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'code' => 'Code',
+            'performer_id' => 'performer_id',
+            'category_id' => 'category_id',
         ];
     }
 
@@ -57,7 +60,7 @@ class Specialization extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(Users::class, ['specialization_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'performer_id']);
     }
 
 }
