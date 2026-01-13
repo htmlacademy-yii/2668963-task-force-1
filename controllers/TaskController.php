@@ -10,6 +10,7 @@ use app\models\Task;
 use app\models\TaskFilterForm;
 use HtmlAcademy\enums\OfferStatus;
 use HtmlAcademy\enums\TaskStatus;
+use yii\data\Pagination;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -23,37 +24,40 @@ class TaskController extends Controller
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['/']);
         }
+
         $filterForm = new TaskFilterForm();
+        $query = Task::find()->where(['status' => 'new']);
 
-        if (Yii::$app->request->isGet) {            
-            
-            $query = Task::find();
 
-            if ($filterForm->load(Yii::$app->request->get(), '')) {
+        if ($filterForm->load(Yii::$app->request->get(), '')) {
 
-                if (!empty($filterForm->categories)) {
-                    $query->andWhere(['category_id' => $filterForm->categories]);
-                }
-                if ($filterForm->withoutPerformer) {
-                    $query->andWhere(['performer_id' => NULL]);
-                }
-                if ($filterForm->creationTime) {
-                    $fromTime = date(
-                        'Y-m-d H:i:s',
-                        time() - $filterForm->creationTime * 3600
-                    );
-                    $query->andWhere(['>=', 'date_add', $fromTime]);
-                }
-
-                $tasks = $query->orderBy(['date_add' => SORT_DESC])->all();
-
-            } else {
-                $tasks = Task::find()
-                    ->where(['status' => 'new'])
-                    ->orderBy(['date_add' => SORT_DESC])
-                    ->all();
+            if (!empty($filterForm->categories)) {
+                $query->andWhere(['category_id' => $filterForm->categories]);
+            }
+            if ($filterForm->withoutPerformer) {
+                $query->andWhere(['performer_id' => NULL]);
+            }
+            if ($filterForm->creationTime) {
+                $fromTime = date(
+                    'Y-m-d H:i:s',
+                    time() - $filterForm->creationTime * 3600
+                );
+                $query->andWhere(['>=', 'date_add', $fromTime]);
             }
         }
+
+        $pagination = new Pagination([
+            'totalCount' => $query->count(),
+            'pageSize' => 3,
+            'pageSizeParam' => false,
+            'forcePageParam' => false,
+        ]);
+
+        $tasks = $query
+            ->orderBy(['date_add' => SORT_DESC])
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
 
         $availableCategories = Category::find()
             ->innerJoinWith('tasks')
@@ -64,6 +68,7 @@ class TaskController extends Controller
 
         return $this->render('index', [
             'tasks' => $tasks,
+            'pagination' => $pagination,
             'availableCategories' => $availableCategories,
             'filterForm' => $filterForm,
         ]);
@@ -87,7 +92,7 @@ class TaskController extends Controller
             $offers = Offer::find()
             ->innerJoin('tasks')
             ->where(['offers.task_id' => $id])
-            ->orderBy([new \yii\db\Expression("offers.status = 'confirmed' DESC"), 'offers.date_add' => SORT_DESC])
+            ->orderBy([new \yii\db\Expression("offers.status = 'confirm' DESC"), 'offers.date_add' => SORT_DESC])
             ->all();
             $isCustomer = true;
 
@@ -189,9 +194,7 @@ class TaskController extends Controller
             }
         }
         
-        if ($newOffer->save()) {
-            echo "Saved!";
-        } else {
+        if (!$newOffer->save()) {
             var_dump($newOffer->errors);
         }
         exit;

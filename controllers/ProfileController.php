@@ -22,7 +22,6 @@ class ProfileController extends Controller
         $model->category_ids = ArrayHelper::getColumn($model->specializations, 'category_id');
 
         if ($model->load(Yii::$app->request->post())) {
-            // var_dump($_POST);
             $oldAvatar = $model->avatar;
             $model->avatarFile = UploadedFile::getInstance($model, 'avatarFile');
 

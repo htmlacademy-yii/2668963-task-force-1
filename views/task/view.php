@@ -1,7 +1,6 @@
 <?php
 /** @var app\models\Task $task */
 
-use app\models\Review;
 use HtmlAcademy\core\Task as CoreTask;
 use HtmlAcademy\enums\OfferStatus;
 use HtmlAcademy\enums\TaskStatus;
@@ -9,22 +8,14 @@ use yii\widgets\ActiveForm;
 
 ?>
 
-<?php
-    var_dump($isCustomer);
-    var_dump($task->status);
-    var_dump(TaskStatus::NEW->value);
-    var_dump($userHasOffer);
-    
-?>
-
 <main class="main-content container">
     <div class="left-column">
         <div class="head-wrapper">
-            <h3 class="head-main"><?= $task->title ?></h3>
-            <p class="price price--big"><?= $task->budget ?> ₽</p>
+            <h3 class="head-main"><?= strip_tags($task->title) ?></h3>
+            <p class="price price--big"><?= strip_tags($task->budget) ?> ₽</p>
         </div>
         <p class="task-description">
-            <?= $task->description ?></p>
+            <?= strip_tags($task->description) ?></p>
 
         <?php if ((Yii::$app->user->identity?->role !== 'customer') && !$isCustomer && (!$userHasOffer && $task->status === TaskStatus::NEW->value)) : ?>
             <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
@@ -62,32 +53,31 @@ use yii\widgets\ActiveForm;
                     });
                 }
             </script>
-            <p class="map-address town"><?= $task->city->name ?></p>
+            <p class="map-address town"><?= strip_tags($task->city->name) ?></p>
             <p class="map-address"><?= $task->city->latitude_deg ?> ; <?= $task->city->longitude_deg ?></p>
         </div>
 
         <h4 class="head-regular">Отклики на задание</h4>
         <?php foreach ($offers as $offer): ?>
             <div class="response-card <?= $retVal = ($offer->status === OfferStatus::DENY->value) ? 'deny' : '' ; ?>">
-                <img class="customer-photo" src="<?= $offer->performer->avatar ?>" width="146" height="156" alt="Фото заказчиков">
+                <img class="customer-photo" src="/<?= $offer->performer->avatar ?>" width="146" height="156" alt="Фото заказчиков">
                 <div class="feedback-wrapper">
                     <a href="/user/view/<?= $offer->performer_id; ?>" class="link link--block link--big">
-                        <?= $offer->performer->name ?> 
-                        <?= $offer->status ?>
-                        <?= $offer->id ?>
+                        <?= strip_tags($offer->performer->name) ?> 
+                        <?= strip_tags($offer->status); ?> 
                     </a>
                     <div class="response-wrapper">
                         <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
                         <p class="reviews">2 отзыва</p>
                     </div>
                     <p class="response-message">
-                        <?= $offer->comment ?>
+                        <?= strip_tags($offer->comment) ?>
                     </p>
 
                 </div>
                 <div class="feedback-wrapper">
                     <p class="info-text" title="<?= $offer->date_add; ?>"><?= Yii::$app->formatter->asRelativeTime($offer->date_add)?></p>
-                    <p class="price price--small"><?= $offer->price ?> ₽</p>
+                    <p class="price price--small"><?= strip_tags($offer->price )?> ₽</p>
                 </div>
                 <?php if ($isCustomer && $offer->status === OfferStatus::NEW->value) : ?>
                     <div class="button-popup">
@@ -130,19 +120,19 @@ use yii\widgets\ActiveForm;
                 <dd><?= CoreTask::statusGetName($task->status) ?></dd>
             </dl>
         </div>
-        <div class="right-card white file-card">
-            <h4 class="head-card">Файлы задания</h4>
-            <ul class="enumeration-list">
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-                    <p class="file-size">356 Кб</p>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--clip">information.docx</a>
-                    <p class="file-size">12 Кб</p>
-                </li>
-            </ul>
-        </div>
+        <?php if ($task->getFiles()->all()) : ?>
+            <div class="right-card white file-card">
+                <h4 class="head-card">Файлы задания</h4>
+                <ul class="enumeration-list">
+                    <?php foreach ($task->getFiles()->all() as $file): ?>
+                    <li class="enumeration-item">
+                        <a href="#" class="link link--block link--clip"><?= $file->real_file_name; ?></a>
+                        <p class="file-size"><?= round(filesize('../uploads/' . $file->file) / 1024, 2) . ' KB' ; ?></p>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 

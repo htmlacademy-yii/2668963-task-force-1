@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use HtmlAcademy\enums\OfferStatus;
 use Yii;
 use yii\web\IdentityInterface;
 
@@ -79,25 +80,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     }
 
-
-    // public function rules()
-    // {
-    //     return [
-    //         [['birthday', 'about', 'avatar', 'phone', 'telegram', 'specialization_id'], 'default', 'value' => null],
-    //         [['date_add', 'birthday'], 'safe'],
-    //         [['role', 'name', 'email', 'city_id'], 'required'],
-    //         [['email'], 'email'],
-    //         [['password', 'password_repeat'], 'required'],
-    //         ['password_repeat', 'compare', 'compareAttribute' => 'password'],
-    //         [['city_id', 'specialization_id'], 'integer'],
-    //         [['role', 'name', 'email', 'about', 'telegram'], 'string', 'max' => 128],
-    //         [['password', 'avatar'], 'string', 'max' => 255],
-    //         [['phone'], 'string', 'max' => 32],
-    //         [['email'], 'unique'],
-    //         [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
-    //         [['specialization_id'], 'exist', 'skipOnError' => true, 'targetClass' => Specializations::class, 'targetAttribute' => ['specialization_id' => 'id']],
-    //     ];
-    // }
     public function rules()
     {
         return [
@@ -127,16 +109,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             [['city_id'], 'integer'],
 
             ['avatar', 'file', 'extensions' => 'png, jpg, jpeg', 'maxSize' => 2 * 1024 * 1024],
-            // ['avatarFile', 'file', 'extensions' => 'png, jpg, jpeg'],
 
             [['city_id'], 'exist', 'skipOnError' => true,
                 'targetClass' => City::class,
                 'targetAttribute' => ['city_id' => 'id']
             ],
-            // [['specialization_id'], 'exist', 'skipOnError' => true,
-            //     'targetClass' => Specialization::class,
-            //     'targetAttribute' => ['specialization_id' => 'id']
-            // ],
         ];
     }
 
@@ -159,7 +136,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'phone' => 'Phone',
             'telegram' => 'Telegram',
             'city_id' => 'City Name',
-            // 'specialization_id' => 'Specialization ID',
         ];
     }
 
@@ -180,7 +156,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getOffers()
     {
-        return $this->hasMany(Offers::class, ['performer_id' => 'id']);
+        return $this->hasMany(Offer::class, ['performer_id' => 'id']);
     }
 
     /**
@@ -200,7 +176,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getReviews0()
     {
-        return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
+        return $this->hasMany(Review::class, ['performer_id' => 'id']);
     }
 
     /**
@@ -208,10 +184,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      *
      * @return \yii\db\ActiveQuery
      */
-    // public function getSpecialization()
-    // {
-    //     return $this->hasOne(Specializations::class, ['id' => 'specialization_id']);
-    // }
     public function getSpecializations()
     {
         return $this->hasMany(Specialization::class, ['performer_id' => 'id']);
@@ -246,5 +218,20 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             return true;
         }
         return false;
+    }
+
+    public function ratingCalculator($user)
+    {
+        $offersQuery = $user->getReviews0()->where(['performer_id' => $user->id]);
+
+        if ($offersQuery->exists()) {
+            $sumScore = $offersQuery->sum('score') ?? null;
+        } else {
+            return null;
+        }
+
+        $ratio = $offersQuery->count() + $user->getOffers()->where(['status' => OfferStatus::FAILED])->count();
+
+        return $sumScore/$ratio;
     }
 }

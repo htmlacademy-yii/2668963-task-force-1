@@ -39,7 +39,6 @@ class AddController extends Controller
             $task->load(Yii::$app->request->post());
 
             $task->status = 'new';
-            // $task->city_id = 777;
             $task->customer_id = Yii::$app->user->identity->id;
 
             $task->deadline = date(
@@ -60,6 +59,7 @@ class AddController extends Controller
                         $fileRecord = new File();
                         $fileRecord->task_id = $task->id;
                         $fileRecord->file = $fileName;
+                        $fileRecord->real_file_name = $file->name;
                         $fileRecord->save(false);
                     }
                 }

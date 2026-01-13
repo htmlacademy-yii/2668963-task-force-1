@@ -1,13 +1,10 @@
 <?php
     use yii\bootstrap5\Html;
-    use yii\web\User;
 
     if (!Yii::$app->user->isGuest) {
         $user = Yii::$app->user->identity;
         $username = $user->name;
-        echo date('Y-m-d H:i:s'); echo ' | '; echo $user?->id; echo ' | '; echo $user?->email; 
     }
-    // $user = Yii::$app->user->identity;
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +41,7 @@
                 </a>
                 <div class="nav-wrapper">
                     <ul class="nav-list">
-                        <li class="list-item"> <!--list-item--active-->
+                        <li class="list-item">
                             <a href="/task" class="link link--nav" >Новое</a>
                         </li>
                         <li class="list-item">
@@ -63,7 +60,7 @@
             </nav>
             <div class="user-block">
                 <a href="#">
-                    <img class="user-photo" src="<?= $user->avatar; ?>" width="55" height="55" alt="Аватар">
+                    <img class="user-photo" src="/<?= strip_tags($user->avatar); ?>" width="55" height="55" alt="Аватар">
                 </a>
                 <div class="user-menu">
                     <p class="user-name"><?= $username; ?></p>
@@ -92,4 +89,3 @@
 
 </div>
 
-<!-- <footer>123</footer> -->

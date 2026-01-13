@@ -196,10 +196,9 @@
 
 <?php
 /* @var $model User */
-
 use yii\authclient\widgets\AuthChoice;
 use yii\widgets\ActiveForm;
-use yii\widgets\ActiveField; ?>
+?>
 
 <section class="modal enter-form form-modal" id="enter-form">
     <?php

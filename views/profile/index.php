@@ -3,7 +3,6 @@
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-    // var_dump($model->category_ids);
 ?>
 
 <style>

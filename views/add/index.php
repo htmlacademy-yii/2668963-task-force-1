@@ -1,7 +1,5 @@
 <?php
     use yii\widgets\ActiveForm;
-    // var_dump($categories);
-    // var_dump($_FILES);
 ?>
 
 <main class="main-content main-content--center container">
@@ -39,7 +37,6 @@
 
         <?= $form->field($task, 'files[]')->fileInput([
             'multiple' => true,
-            // 'class' => 'new-file',
             ])->label('Файл') ?>
 
         <input type="submit" class="button button--blue" value="Опубликовать">

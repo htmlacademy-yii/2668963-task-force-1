@@ -1,16 +1,11 @@
 <?php
 /** @var yii\web\View $this */
 
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
-    use yii\widgets\ActiveField;
+    use yii\helpers\ArrayHelper;
+    use yii\helpers\Html;
     use yii\widgets\ActiveForm; 
 ?>
 
-<?php
-    // print_r($model->getAttributeLabel('name'));
-    // var_dump($_POST);
-?>
 
 <main class="container container--registration">
     <div class="center-block">

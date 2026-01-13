@@ -30,12 +30,6 @@ class Specialization extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        // return [
-        //     [['title', 'code'], 'required'],
-        //     [['title', 'code'], 'string', 'max' => 128],
-        //     [['title'], 'unique'],
-        //     [['code'], 'unique'],
-        // ];
         return [
             [['performer_id', 'category_id'], 'required'],
         ];
@@ -61,6 +55,16 @@ class Specialization extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(User::class, ['id' => 'performer_id']);
+    }
+
+    /**
+     * Gets query for [[Category]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCategory()
+    {
+        return $this->hasMany(Category::class, ['id' => 'category_id']);
     }
 
 }

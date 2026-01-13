@@ -1,6 +1,4 @@
-<?php
-    // print_r($newTasks);
-?>
+
 <style>
     .fixedMenu{
         position: fixed;
@@ -44,18 +42,18 @@
             <?php foreach ($newTasks as $task): ?>
                 <div class="task-card">
                     <div class="header-task">
-                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= $task->title; ?></a>
-                        <p class="price price--task"><?= $task->budget; ?> ₽</p>
+                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= strip_tags($task->title); ?></a>
+                        <p class="price price--task"><?= strip_tags($task->budget); ?> ₽</p>
                     </div>
                     <p class="info-text" title="<?= $task->date_add; ?>">
                         <span class="current-time"><?= Yii::$app->formatter->asRelativeTime($task->date_add)?></span>
                     </p>
                     <p class="task-text">
-                        <?= $task->description; ?>
+                        <?= strip_tags($task->description); ?>
                     </p>
                     <div class="footer-task">
-                        <p class="info-text town-text"><?= $task->city->name; ?></p>
-                        <p class="info-text category-text"><?= $task->category->name; ?></p>
+                        <p class="info-text town-text"><?= strip_tags($task->city->name); ?></p>
+                        <p class="info-text category-text"><?= strip_tags($task->category->name); ?></p>
                         <a href="/task/view/<?= $task->id; ?>" class="button button--black">Смотреть Задание</a>
                     </div>
                 </div>
@@ -69,18 +67,18 @@
             <?php foreach ($inProgressTasks as $task): ?>
                 <div class="task-card">
                     <div class="header-task">
-                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= $task->title; ?></a>
-                        <p class="price price--task"><?= $task->budget; ?> ₽</p>
+                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= strip_tags($task->title); ?></a>
+                        <p class="price price--task"><?= strip_tags($task->budget); ?> ₽</p>
                     </div>
                     <p class="info-text" title="<?= $task->date_add; ?>">
                         <span class="current-time"><?= Yii::$app->formatter->asRelativeTime($task->date_add)?></span>
                     </p>
                     <p class="task-text">
-                        <?= $task->description; ?>
+                        <?= strip_tags($task->description); ?>
                     </p>
                     <div class="footer-task">
-                        <p class="info-text town-text"><?= $task->city->name; ?></p>
-                        <p class="info-text category-text"><?= $task->category->name; ?></p>
+                        <p class="info-text town-text"><?= strip_tags($task->city->name); ?></p>
+                        <p class="info-text category-text"><?= strip_tags($task->category->name); ?></p>
                         <a href="/task/view/<?= $task->id; ?>" class="button button--black">Смотреть Задание</a>
                     </div>
                 </div>
@@ -94,18 +92,18 @@
             <?php foreach ($closedTasks as $task): ?>
                 <div class="task-card">
                     <div class="header-task">
-                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= $task->title; ?></a>
-                        <p class="price price--task"><?= $task->budget; ?> ₽</p>
+                        <a  href="/task/view/<?= $task->id; ?>" class="link link--block link--big"><?= strip_tags($task->title); ?></a>
+                        <p class="price price--task"><?= strip_tags($task->budget); ?> ₽</p>
                     </div>
                     <p class="info-text" title="<?= $task->date_add; ?>">
                         <span class="current-time"><?= Yii::$app->formatter->asRelativeTime($task->date_add)?></span>
                     </p>
                     <p class="task-text">
-                        <?= $task->description; ?>
+                        <?= strip_tags($task->description); ?>
                     </p>
                     <div class="footer-task">
-                        <p class="info-text town-text"><?= $task->city->name; ?></p>
-                        <p class="info-text category-text"><?= $task->category->name; ?></p>
+                        <p class="info-text town-text"><?= strip_tags($task->city->name); ?></p>
+                        <p class="info-text category-text"><?= strip_tags($task->category->name); ?></p>
                         <a href="/task/view/<?= $task->id; ?>" class="button button--black">Смотреть Задание</a>
                     </div>
                 </div>

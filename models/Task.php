@@ -59,7 +59,7 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['status', 'performer_id'], 'default', 'value' => null],
-            [['date_add', 'deadline'], 'safe'],
+            [['date_add', 'deadline', 'files'], 'safe'],
             [['title', 'description', 'category_id', 'location', 'budget', 'deadline', 'city_id', 'customer_id'], 'required'],
             [['files'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 5],
             [['category_id', 'city_id', 'customer_id', 'performer_id'], 'integer'],
