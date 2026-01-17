@@ -179,98 +179,10 @@ class Task extends \yii\db\ActiveRecord
         }
     }
 
-    /**
-     * Принятие оффера заказчиком
-     */
-    public function accept(int $userId, int $offerId): bool
-    {
-        if (!$this->canBeChangedBy($userId)) {
-            return false;
-        }
-        if ($this->status !== TaskStatus::NEW->value) {
-            return false;
-        }
-
-
-        $offer = Offer::findOne([
-            'id' => $offerId,
-            'task_id' => $this->id
-        ]);
-
-        if (!$offer) {
-            return false;
-        }
-
-        $this->performer_id = $offer->performer_id;
-        $this->status = TaskStatus::INPROGRESS->value;
-
-        $offer->status = OfferStatus::CONFIRM->value;
-        $offer->save(false);
-        
-        Offer::updateAll(
-            ['status' => OfferStatus::DENY->value],
-            ['and', ['task_id' => $this->id], ['!=', 'id', $offerId]]
-        );
-
-
-        return $this->save(false);
-    }
-
-    /**
-     * Отказ оффера заказчиком
-     */    
-    public function reject($userId, $offerId): bool
-    {
-        if (!$this->canBeChangedBy($userId)) {
-            return false;
-        }
-
-        $offer = Offer::findOne([
-            'id' => $offerId,
-            'task_id' => $this->id
-        ]);
-
-        if (!$offer) {
-            return false;
-        }
-
-        $offer->status = OfferStatus::DENY->value;
-        return $offer->save(false);
-    }
-
-    /**
-     *  Отмена задания заказчиком
-     */    
-    public function cancel($userId, $taskId): bool
-    {
-        if (!$this->canBeChangedBy($userId)) {
-            return false;
-        }
-
-        $task = Task::findOne([
-            'id' => $taskId,
-        ]);
-
-        if (!$task) {
-            return false;
-        }
-
-        Offer::updateAll(
-            ['status' => OfferStatus::DENY->value],
-            ['and', ['task_id' => $this->id]]
-        );
-        
-        $task->status = TaskStatus::CANCELED->value;
-        return $task->save(false);
-    }
-
-
-
-    private function canBeChangedBy($userId): bool
+    public function canBeChangedBy($userId): bool
     {
         return $this->customer_id === $userId
             && $this->status === TaskStatus::NEW->value;
     }
-
 
 }

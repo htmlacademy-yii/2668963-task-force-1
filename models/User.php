@@ -231,7 +231,24 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         }
 
         $ratio = $offersQuery->count() + $user->getOffers()->where(['status' => OfferStatus::FAILED])->count();
-
+        
         return $sumScore/$ratio;
+    }
+
+    public function afterLogin()
+    {
+        $auth = Yii::$app->authManager;
+
+        if ($auth->getRolesByUser($this->id)) {
+            return;
+        }
+
+        if ($this->role === 'customer') {
+            $auth->assign($auth->getRole('customer'), $this->id);
+        }
+
+        if ($this->role === 'performer') {
+            $auth->assign($auth->getRole('performer'), $this->id);
+        }
     }
 }

@@ -6,6 +6,7 @@ use app\models\Category;
 use app\models\File;
 use app\models\Task;
 use Yii;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\Response;
@@ -14,13 +15,23 @@ use yii\widgets\ActiveForm;
 
 class AddController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['customer'],
+                    ],
+                ],
+            ],
+        ];
+    }
     
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest || Yii::$app->user->identity->role !== 'customer') {
-            return $this->redirect(['/']);
-        }
-
         $categories = Category::find()->all();
         $categoryList = ArrayHelper::map($categories, 'id', 'name');
 

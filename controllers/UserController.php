@@ -7,14 +7,27 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\User;
 use HtmlAcademy\enums\OfferStatus;
+use yii\filters\AccessControl;
 
 class UserController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect(['/']);
-        }
         return $this->render('index', [
 
         ]);
@@ -37,10 +50,12 @@ class UserController extends Controller
 
     public function actionView($id)
     {
-        if (Yii::$app->user->identity->role === 'customer') {
+
+        $user = User::findOne($id);
+
+        if ($user->role === 'customer') {
             return $this->redirect(['/']);
         }
-        $user = User::findOne($id);
 
         if ($user === null) {
             throw new NotFoundHttpException('Пользователь не найден');

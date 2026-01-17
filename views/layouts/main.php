@@ -1,10 +1,12 @@
 <?php
     use yii\bootstrap5\Html;
+use yii\web\ForbiddenHttpException;
 
     if (!Yii::$app->user->isGuest) {
         $user = Yii::$app->user->identity;
         $username = $user->name;
     }
+    // var_dump($auth);
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +32,7 @@
     <header class="page-header">
         <?php  if (Yii::$app->controller->route == 'signup/index'): ?>
             <nav class="main-nav">
-                <a href='/' class="header-logo">
+                <a href='/task' class="header-logo">
                     <img class="logo-image" src="<?= Yii::getAlias('@web/img/logotype.png') ?>" width=227 height=60 alt="taskforce">
                 </a>
             </nav>
@@ -47,7 +49,7 @@
                         <li class="list-item">
                             <a href="/mytask" class="link link--nav">Мои задания</a>
                         </li>
-                        <?php if ($user->role === 'customer') { ?>
+                        <?php if (Yii::$app->user->can('createTask')) { ?>
                             <li class="list-item">
                                 <a href="/add" class="link link--nav">Создать задание</a>
                             </li>
@@ -60,7 +62,7 @@
             </nav>
             <div class="user-block">
                 <a href="#">
-                    <img class="user-photo" src="/<?= strip_tags($user->avatar); ?>" width="55" height="55" alt="Аватар">
+                    <img class="user-photo" src="/<?php $user->avatar ? print(strip_tags($user->avatar)) : print('default-avatar.jpg'); ?>" width="55" height="55" alt="Аватар">
                 </a>
                 <div class="user-menu">
                     <p class="user-name"><?= $username; ?></p>

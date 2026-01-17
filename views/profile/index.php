@@ -59,7 +59,7 @@ use yii\helpers\Html;
                 <?= $form->field($model, 'email')->textInput(['readonly' => true]) ?>
 
                 <?= $form->field($model, 'birthday')->input('date', [
-                    'value' => date('Y-m-d', strtotime($model->birthday))
+                    'value' => $model->birthday ? date('Y-m-d', strtotime($model->birthday)) : null
                 ]) ?>
 
                 <?= $form->field($model, 'phone')->textInput() ?>

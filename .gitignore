@@ -59,6 +59,5 @@ config/*.local.php
 # Composer lock file
 composer.lock
 
-DockerFile
 access.log
 error.log

@@ -2,17 +2,37 @@
 namespace app\controllers;
 use app\models\LoginForm;
 use Yii;
+use yii\filters\AccessControl;
 use yii\widgets\ActiveForm;
 use yii\web\Controller;
 use yii\web\Response;
 
 class LandingController extends Controller
 {    
+
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index'],
+                        'controllers' => ['task'],
+                        'roles' => ['customer', 'performer'],
+                    ],
+                    [
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->redirect(['/task']);
-        }
 
         $model = new LoginForm();
 

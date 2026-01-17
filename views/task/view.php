@@ -17,11 +17,11 @@ use yii\widgets\ActiveForm;
         <p class="task-description">
             <?= strip_tags($task->description) ?></p>
 
-        <?php if ((Yii::$app->user->identity?->role !== 'customer') && !$isCustomer && (!$userHasOffer && $task->status === TaskStatus::NEW->value)) : ?>
+        <?php if ((Yii::$app->user->can('respondTask')) && (!$userHasOffer && $task->status === TaskStatus::NEW->value)) : ?>
             <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
         <?php endif; ?>
 
-        <?php if ($userHasOffer && $task->status === TaskStatus::INPROGRESS->value) : ?>
+        <?php if ($isPerformer && $userHasOffer && $task->status === TaskStatus::INPROGRESS->value) : ?>
             <a href="#" class="button button--orange action-btn" data-action="fail">Отказаться от задания</a>
         <?php endif; ?>
 
@@ -56,55 +56,58 @@ use yii\widgets\ActiveForm;
             <p class="map-address town"><?= strip_tags($task->city->name) ?></p>
             <p class="map-address"><?= $task->city->latitude_deg ?> ; <?= $task->city->longitude_deg ?></p>
         </div>
+        
+        <?php if($isCustomer || $userHasOffer): ?>
+            <h4 class="head-regular">Отклики на задание</h4>
+            <?php foreach ($offers as $offer): ?>
+                <div class="response-card <?= $retVal = ($offer->status === OfferStatus::DENY->value) ? 'deny' : '' ; ?>">
+                    <img class="customer-photo" src="/<?php $offer->performer->avatar ? print(strip_tags($offer->performer->avatar)) : print('default-avatar.jpg'); ?>" width="146" height="156" alt="Фото заказчиков">
+                    <div class="feedback-wrapper">
+                        <a href="/user/view/<?= $offer->performer_id; ?>" class="link link--block link--big">
+                            <?= strip_tags($offer->performer->name) ?> 
+                            <?= strip_tags($offer->status); ?> 
+                        </a>
+                        <div class="response-wrapper">
+                            <?php if ($offer->performer->getReviews0()->count()): ?>
+                                <div class="stars-rating small"><span class="fill-star">&nbsp;</span><?= round($offer->performer->ratingCalculator($offer->performer), 2) ?></div>
+                            <?php endif; ?>
+                            <p class="reviews">Отзывов: <?= $offer->performer->getReviews0()->count() ?></p>
+                        </div> 
+                        <p class="response-message">
+                            <?= strip_tags($offer->comment) ?>
+                        </p>
 
-        <h4 class="head-regular">Отклики на задание</h4>
-        <?php foreach ($offers as $offer): ?>
-            <div class="response-card <?= $retVal = ($offer->status === OfferStatus::DENY->value) ? 'deny' : '' ; ?>">
-                <img class="customer-photo" src="/<?= $offer->performer->avatar ?>" width="146" height="156" alt="Фото заказчиков">
-                <div class="feedback-wrapper">
-                    <a href="/user/view/<?= $offer->performer_id; ?>" class="link link--block link--big">
-                        <?= strip_tags($offer->performer->name) ?> 
-                        <?= strip_tags($offer->status); ?> 
-                    </a>
-                    <div class="response-wrapper">
-                        <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
-                        <p class="reviews">2 отзыва</p>
                     </div>
-                    <p class="response-message">
-                        <?= strip_tags($offer->comment) ?>
-                    </p>
-
-                </div>
-                <div class="feedback-wrapper">
-                    <p class="info-text" title="<?= $offer->date_add; ?>"><?= Yii::$app->formatter->asRelativeTime($offer->date_add)?></p>
-                    <p class="price price--small"><?= strip_tags($offer->price )?> ₽</p>
-                </div>
-                <?php if ($isCustomer && $offer->status === OfferStatus::NEW->value) : ?>
-                    <div class="button-popup">
-                        <?= \yii\helpers\Html::a(
-                            'Принять',
-                            ['task/accept', 'taskId' => $task->id, 'offerId' => $offer->id],
-                            [
-                                'data-method' => 'post',
-                                'class' => 'button button--blue button--small',
-                                'data-confirm' => 'Принять исполнителя?'
-                            ]
-                        ) ?>
-
-                        <?= \yii\helpers\Html::a(
-                            'Отказать',
-                            ['task/reject', 'taskId' => $task->id, 'offerId' => $offer->id],
-                            [
-                                'class' => 'button button--orange button--small',
-                                'data-method' => 'post',
-                                'data-confirm' => 'Отказать исполнителю?'
-                            ]
-                        ) ?>
+                    <div class="feedback-wrapper">
+                        <p class="info-text" title="<?= $offer->date_add; ?>"><?= Yii::$app->formatter->asRelativeTime($offer->date_add)?></p>
+                        <p class="price price--small"><?= strip_tags($offer->price )?> ₽</p>
                     </div>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
+                    <?php if ($isCustomer && $offer->status === OfferStatus::NEW->value) : ?>
+                        <div class="button-popup">
+                            <?= \yii\helpers\Html::a(
+                                'Принять',
+                                ['task/accept', 'taskId' => $task->id, 'offerId' => $offer->id],
+                                [
+                                    'data-method' => 'post',
+                                    'class' => 'button button--blue button--small',
+                                    'data-confirm' => 'Принять исполнителя?'
+                                ]
+                            ) ?>
 
+                            <?= \yii\helpers\Html::a(
+                                'Отказать',
+                                ['task/reject', 'taskId' => $task->id, 'offerId' => $offer->id],
+                                [
+                                    'class' => 'button button--orange button--small',
+                                    'data-method' => 'post',
+                                    'data-confirm' => 'Отказать исполнителю?'
+                                ]
+                            ) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
     <div class="right-column">
         <div class="right-card black info-card">

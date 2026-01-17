@@ -39,6 +39,6 @@ class LoginForm extends Model
         if (!$user || !Yii::$app->security->validatePassword($this->password, $user->password)) {
             $this->addError($attribute, 'Неправильный email или пароль');
         }
-
+        $user->afterLogin();
     }
 }

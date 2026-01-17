@@ -8,9 +8,11 @@ use app\models\Offer;
 use app\models\Review;
 use app\models\Task;
 use app\models\TaskFilterForm;
+use app\services\TaskService;
 use HtmlAcademy\enums\OfferStatus;
 use HtmlAcademy\enums\TaskStatus;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -19,6 +21,21 @@ use yii\widgets\ActiveForm;
 
 class TaskController extends Controller
 {
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['customer', 'performer'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function actionIndex()
     {
         if (Yii::$app->user->isGuest) {
@@ -109,11 +126,21 @@ class TaskController extends Controller
         $userHasOffer = $currentUserId
             ? Offer::find()->where(['task_id' => $task->id, 'performer_id' => $currentUserId])->exists()
             : false;
+        
+        $isPerformer = $currentUserId
+            ? Offer::find()
+                ->where([
+                'task_id' => $task->id, 
+                'performer_id' => $currentUserId,
+                'status' => OfferStatus::CONFIRM,
+                ])->exists()
+            : false;
 
         return $this->render('view', [
             'task' => $task,
             'offers' => $offers,
             'isCustomer' => $isCustomer,
+            'isPerformer' => $isPerformer,
             'userHasOffer' => $userHasOffer,
             'newOffer' => $newOffer,
             'review' => $review,
@@ -125,9 +152,9 @@ class TaskController extends Controller
      */
     public function actionCancel($taskId)
     {
-        $task = Task::findOne($taskId);
+        $taskService = new TaskService;
 
-        if (!$task->cancel(Yii::$app->user->id, $taskId)) {
+        if (!$taskService->cancel(Yii::$app->user->id, $taskId)) {
             Yii::$app->session->setFlash('error', 'Нельзя удалить');
         }
 
@@ -208,9 +235,10 @@ class TaskController extends Controller
     public function actionAccept($taskId, $offerId)
     {
         $task = Task::findOne($taskId);
+        $taskService = new TaskService;
 
-        if (!$task || !$task->accept(Yii::$app->user->id, $offerId)) {
-            throw new ForbiddenHttpException();
+        if (!$task || !$taskService->accept(Yii::$app->user->id, $taskId, $offerId)) {
+            throw new NotFoundHttpException();
         }
 
         return $this->redirect(['view', 'id' => $taskId]);
@@ -221,9 +249,9 @@ class TaskController extends Controller
      */
     public function actionReject($taskId, $offerId)
     {
-        $task = Task::findOne($taskId);
+        $taskService = new TaskService;
 
-        if (!$task->reject(Yii::$app->user->id, $offerId)) {
+        if (!$taskService->reject(Yii::$app->user->id, $taskId, $offerId)) {
             Yii::$app->session->setFlash('error', 'Нельзя отказать');
         }
 
